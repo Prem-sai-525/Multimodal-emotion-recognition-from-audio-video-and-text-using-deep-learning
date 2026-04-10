@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal AI Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --terminal: #000; }
+        body { background-color: var(--bg); color: #f1f5f9; font-family: 'Inter', sans-serif; }
+        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 2rem; }
+        .terminal { background: var(--terminal); color: #10b981; font-family: 'Courier New', monospace; padding: 20px; border-radius: 12px; height: 380px; overflow-y: auto; border: 1px solid #334155; font-size: 0.95rem; }
+        .res-text { font-size: 3.5rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        #videoPreview { width: 100%; border-radius: 15px; background: #000; border: 2px solid #334155; transform: scaleX(-1); }
+        .nav-pills .nav-link { color: #94a3b8; border-radius: 10px; cursor: pointer; }
+        .nav-pills .nav-link.active { background-color: var(--accent); color: var(--bg); font-weight: bold; }
+        .rec-blink { color: #ef4444; animation: blink 1s infinite; font-weight: bold; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        
+        /* Updated Styles */
+        .header-container { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 10px; }
+        .college-logo { height: 60px; width: auto; }
+        .college-name { font-size: 1.8rem; font-weight: 700; text-transform: uppercase; margin: 0; line-height: 60px; }
+        .abstract-box { max-width: 900px; margin: 0 auto 40px auto; padding: 1.5rem; background: rgba(56, 189, 248, 0.05); border-radius: 15px; border-left: 4px solid var(--accent); }
+        .info-footer { margin-top: 4rem; border-top: 1px solid #334155; padding-top: 2rem; }
+        .info-title { color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 10px; }
+    </style>
+</head>
+<body class="py-5">
+
+<div class="container">
+    <header class="text-center">
+        <h2 class="fw-bold mb-1">Multimodal Emotion Recognition</h2>
+        <p class="text-muted mb-4">Late Fusion Analysis (Face + Audio + Text)</p>
+    </header>
+
+    <div class="abstract-box">
+        <h6 class="text-accent small fw-bold text-uppercase mb-2" style="color: var(--accent);">Abstract</h6>
+        <p  style="line-height: 1.6; text-align: justify;">
+            This project presents a deep learning–based Multimodal Emotion Recognition system that integrates audio, video, and text to achieve emotion classification. Unlike unimodal approaches that struggle with noise, occlusion, and ambiguity, the proposed framework leverages three powerful pre-trained models—Wav2Vec2 for audio, MobileNetV2 for facial features, and BERT for text understanding—to extract rich and complementary features from each modality.
+        </p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="glass-card h-100">
+                <ul class="nav nav-pills nav-justified mb-4" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#upload" type="button">Upload Video</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#live" type="button">Live Record</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="upload">
+                        <label class="form-label text-muted small">Select local file for analysis</label>
+                        <input type="file" id="vidFile" class="form-control bg-dark text-white border-secondary mb-3">
+                        <button onclick="processUpload()" id="upBtn" class="btn btn-primary w-100 py-3 fw-bold">Analyze</button>
+                    </div>
+
+                    <div class="tab-pane fade text-center" id="live">
+                        <video id="videoPreview" autoplay muted class="mb-3"></video>
+                        <div id="recStatus" class="rec-blink d-none mb-2">● RECORDING IN PROGRESS</div>
+                        <button id="recBtn" onclick="startRecording()" class="btn btn-danger w-100 py-3 fw-bold">START 5s CAPTURE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="glass-card h-100">
+                <h6 class="text-muted small mb-3">NEURAL PROCESSING LOGS</h6>
+                <div id="term" class="terminal mb-4"></div>
+                
+                <div id="resCard" class="text-center d-none">
+                    <hr class="border-secondary mb-4">
+                    <div class="small text-muted">FINAL MULTIMODAL RESULT</div>
+                    <div id="finalEmotion" class="res-text">---</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="info-footer">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="info-title">PROJECT TEAM</div>
+                <div>
+                    <div>P PREM SAI (22F41A0578)</div>
+                    <div>R HARSHITH RAM (22F41A0592)</div>
+                    <div>N L RANJITH (22F41A0576)</div>
+                    <div>N SRI LATHA (22F41A0572)</div>
+                    <div>S ARSHIYA ANJUM (22F41A05A1)</div>
+                </div>
+            </div>
+            <div class="col-md-5 text-md-end mt-4 mt-md-0">
+                <div class="info-title">UNDER THE GUIDANCE OF</div>
+                <div class="fw-bold">Mr. G. S. UDAY KUMAR, M.Tech.,(Ph.D.)</div>
+                <div >Assistant Professor, Department of CSE</div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    let mediaRecorder;
+    let chunks = [];
+
+    function log(msg, color = "#10b981") {
+        const t = document.getElementById('term');
+        const now = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        t.innerHTML += `<div style="color:${color}; margin-bottom: 5px;"><span style="color:#64748b">[${now}] ></span> ${msg}</div>`;
+        t.scrollTop = t.scrollHeight;
+    }
+
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('videoPreview').srcObject = stream;
+            const options = { mimeType: 'video/webm;codecs=vp8,opus' };
+            mediaRecorder = new MediaRecorder(stream, options);
+            chunks = [];
+            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                stream.getTracks().forEach(track => track.stop());
+                sendToServer(blob, "live_capture.webm");
+            };
+            mediaRecorder.start();
+            document.getElementById('recStatus').classList.remove('d-none');
+            document.getElementById('recBtn').disabled = true;
+            log("Camera active. Capture started (5 seconds)...", "#38bdf8");
+            setTimeout(() => {
+                if (mediaRecorder.state !== "inactive") {
+                    mediaRecorder.stop();
+                    document.getElementById('recStatus').classList.add('d-none');
+                    document.getElementById('recBtn').disabled = false;
+                }
+            }, 5000);
+        } catch (err) {
+            log("ERROR: Permission denied or Camera not found.", "#ef4444");
+        }
+    }
+
+    function processUpload() {
+        const file = document.getElementById('vidFile').files[0];
+        if (!file) return alert("Please select a file first.");
+        sendToServer(file, file.name);
+    }
+
+    async function sendToServer(blob, fileName) {
+        document.getElementById('term').innerHTML = "";
+        document.getElementById('resCard').classList.add('d-none');
+        log("Initialising neural pipeline analysis...", "#38bdf8");
+        const fd = new FormData();
+        fd.append('video', blob, fileName);
+        try {
+            const response = await fetch('/analyze', { method: 'POST', body: fd });
+            const data = await response.json();
+            if (data.error) {
+                log("PIPELINE ERROR: " + data.error, "#ef4444");
+                return;
+            }
+            data.logs.forEach(l => {
+                const isWarning = l.label.includes("unclear") || l.label.includes("Unavailable");
+                const color = isWarning ? "#fbbf24" : "#10b981";
+                let logMsg = `<span style="font-weight:bold;">[${l.mode}]</span> Detection: ${l.label}`;
+                if (l.transcription) {
+                    logMsg += `<br><span style="color: #fbbf24; margin-left: 25px;">➔ Speech: "${l.transcription}"</span>`;
+                }
+                log(logMsg, color);
+            });
+            const display = document.getElementById('finalEmotion');
+            const finalEmoji = data.emoji ? data.emoji : "";
+            display.innerText = `${finalEmoji} ${data.final}`;
+            display.style.color = (data.final === "NOTHING TO RECOGNIZE") ? "#ef4444" : "#38bdf8";
+            document.getElementById('resCard').classList.remove('d-none');
+            log("Analysis sequence complete.", "#38bdf8");
+        } catch (err) {
+            log("CONNECTION ERROR: Server unreachable.", "#ef4444");
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
